@@ -1,4 +1,37 @@
-# Requirements for OS
+# IrDA Box
+
+## Introduction
+
+The Wifi-to-IrDA Internet Sharing Bridge (**IrDA Box**) is an innovative and cutting-edge device designed to address the connectivity gap between older devices with IrDA ports, such as legacy PDAs and Handheld PCs, and modern wireless networks. By harnessing the power of wireless optical communication, this bridge seamlessly connects devices with only IrDA support to the vast resources of the internet via a WiFi network. This groundbreaking technology ensures that even outdated gadgets can now access the internet, opening up new possibilities for productivity, communication, and entertainment.
+
+## What is for ?
+
+1. IrDA to WiFi Conversion: The device acts as a bridge, converting signals between Infrared Data Association (IrDA) and WiFi, effectively translating wireless signals to enable internet access for IrDA-supported devices.
+2. Seamless Integration: The device seamlessly integrates into existing WiFi networks, making the setup process hassle-free and user-friendly. Users can easily connect their IrDA-equipped devices to the WiFi network, ensuring a smooth and uninterrupted internet experience.
+3. Compact and Portable: The IrDA-to-WiFi bridge is designed to be compact and portable, making it easy to carry and use on the go. Its sleek design ensures it blends seamlessly into any environment, lol.
+4. Compatibility: The bridge is compatible with a wide range of legacy devices that support the IrDA standard, including PDAs, Handheld PCs, and other similar gadgets. Now, these devices can join the modern internet age without requiring expensive upgrades or replacements.
+Secure Connection: Security is of paramount importance, and the bridge is equipped with advanced encryption protocols to safeguard user data and ensure a secure internet connection.
+5. Low Power Consumption: The device is engineered to consume minimal power, maximizing its operational efficiency and extending battery life for portable devices.
+
+# Where to buy ?
+
+I'm sorry at the time the device is in prototype stage and no ETA is defined.
+
+
+# Build yourself
+
+You can make the device yourself, just make sure you have these components, required for the device to be built:
+
+* [OrangePI Lite](https://www.aliexpress.com/item/1005002557347741.html) or compatible OrangePI device with H3 SoC (Others such as RaspberryPI cant be used but currently not supported yet!
+* Spare MicrosSD card with at least 8GB in size
+* Write [Armbian 22.02.1 Focal](https://stpete-mirror.armbian.com/archive/orangepilite/archive/Armbian_22.02.1_Orangepilite_focal_current_5.15.25.img.xz) to MicroSD Card
+* 2x [buttons](https://www.aliexpress.com/item/32703664513.html)
+* 3x [led diodes](https://www.aliexpress.com/item/1005005182451381.html)
+* 3D Printer for [Case]() printing
+
+
+
+## Requirements for OS
 
 * https://github.com/orangepi-xunlong/wiringOP Install wiringpi
 ```
@@ -6,35 +39,37 @@ git clone https://github.com/orangepi-xunlong/wiringOP.git
 cd wiringOP && ./build
 ```
 
-# GPIO Pins
+## GPIO Pins
 
-Mentioned board pins means that the wire goes directly to the physical pin number as shown in the picture https://žn.lt/wiki/Vaizdas:OPiLite_pinout.jpg
+Mentioned board pins means that the wire goes directly to the physical pin number as shown in the picture 
 
-UPS+ -> Board 5V (VCC)
-UPS- -> Board GND
+<img src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/irda_box_wiring.jpeg" data-canonical-src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/irda_box_wiring.jpeg" width="600"/>
 
-Lower button pin1 -> Board pin 5
-Lower button pin2 -> Board pin 39
+| Component pin | Board pin |
+| ------------- | ------------- |
+| UPS/Battery **+**  | 5V (VCC)  |
+| UPS/Battery **-**  | GND  |
+| Left button pin1   | 5 |
+| Left button pin2   | 39 |
+| Right button pin1  | 7 |
+| Right button pin2  | 39 |
+| Upper diode (blue) + | 15 |
+| Middle diode (green) + | 19 |
+| Lower diode (red) + | 21 |
 
-Upper button pin1 -> Board pin 7
-Upper button pin2 -> Board pin 39
+All leds grounds (the short leg) - goes to the ground
 
-Upper diode (blue) + -> Board pin 15
-Middle diode (green) + -> Board pin 19
-Lower diode (red) + -> Board pin 21
-All leds ground (the short leg) - goes to the ground
-
-# GPIO Pins to Leds in Linux
+### GPIO Pins to Leds in Linux
 
 Open file `cat /boot/armbianEnv.txt` and see whats in the `overlay_prefix=` line, mine value is `sun8i-h3`.
 
-## Install the required tools
+#### Install the required tools
 
 ```
 # apt-get install device-tree-compiler
 ```
 
-## Compile overlay and install it 
+### Compile overlay and install it 
 
 **Keep note that i'm using the same prefix as we seen in the `overlay_prefix=` before**
 
