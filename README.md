@@ -27,6 +27,7 @@ You can make the device yourself, just make sure you have these components, requ
 * Write [Armbian 22.02.1 Focal](https://stpete-mirror.armbian.com/archive/orangepilite/archive/Armbian_22.02.1_Orangepilite_focal_current_5.15.25.img.xz) to MicroSD Card
 * 2x [buttons](https://www.aliexpress.com/item/32703664513.html)
 * 3x [led diodes](https://www.aliexpress.com/item/1005005182451381.html)
+* 1x 5mm [switch button](https://www.aliexpress.com/item/4001207529493.html)
 * 3D Printer for [Case]() printing
 * Some soldering skills
 * [Soldering iron](https://www.aliexpress.com/item/1005005368783447.html)
