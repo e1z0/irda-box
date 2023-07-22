@@ -1,0 +1,58 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * gpio-led - generic connection of kernel's LED framework to the RPI's GPIO.
+ * (c) e1z0 2023
+ * Copyright (C) 2021 House Gordon Software Company Ltd. <assafgordon@gmail.com>
+ *
+ * Based on information from:
+ *   https://mjoldfield.com/atelier/2017/03/rpi-devicetree.html
+ *   https://www.raspberrypi.org/documentation/configuration/device-tree.md
+ *   https://www.kernel.org/doc/html/latest/leds/index.html
+ *   https://forum.armbian.com/topic/112-dtb-howto-add-leds/
+ *
+ * compile with:
+ *   dtc -@ -Hepapr -I dts -O dtb -o gpio-led.dtbo gpio-led-overlay.dts
+ * more in README.md
+ */
+
+
+/dts-v1/;
+/plugin/;
+
+/ {
+compatible = "allwinner,sun8i-h3";
+
+fragment@0 {
+  target = <&pio>;
+  __overlay__ {
+   gpio_pin: gpio_pin {
+    pins = "PC0","PC2";
+    function = "gpio_out";
+   };
+  };
+};
+
+fragment@1 {
+  target-path = "/";
+  __overlay__ {
+   gpiopull: gpiopull {
+    compatible = "gpio-leds";
+    pinctrl-names = "default";
+    pinctrl-0 = <&gpio_pin>;
+    status = "okay";
+    gpio_out_1 {
+     label = "irda-box:green";
+     gpios = <&pio 0 64 0>;  /* GREEN LED */
+     linux,default-trigger = "phy0rx";
+    };
+    gpio_out_2 {
+     label = "irda-box:red";
+     gpios = <&pio 0 65 0>;  /* RED LED */
+     default-state = "om";
+     linux,default-trigger = "cpu";
+    };
+
+   };
+  };
+};
+};

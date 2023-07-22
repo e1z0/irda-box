@@ -6,10 +6,10 @@ import (
 )
 
 var (
-// uper blue led
-UPPER_LED = 8
-// middle green led
-MIDDLE_LED = 11
+// uper green led
+UPPER_LED = 11
+// middle blue led
+MIDDLE_LED = 8
 // lower red led
 LOWER_LED = 12
 leds []Led

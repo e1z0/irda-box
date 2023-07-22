@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Turn on onboard red led when kernel panic accours
+echo panic > /sys/class/leds/orangepi\:red\:status/trigger
