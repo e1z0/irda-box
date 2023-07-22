@@ -23,6 +23,7 @@ I'm sorry at the time the device is in prototype stage and no ETA is defined.
 You can make the device yourself, just make sure you have these components, required for the device to be built:
 
 * [OrangePI Lite](https://www.aliexpress.com/item/1005002557347741.html) or compatible OrangePI device with H3 SoC (Others such as RaspberryPI cant be used but currently not supported yet!
+* [IrDA Adapter](https://www.ebay.com/itm/385652134546)
 * Spare MicrosSD card with at least 8GB in size
 * Write [Armbian 22.02.1 Focal](https://stpete-mirror.armbian.com/archive/orangepilite/archive/Armbian_22.02.1_Orangepilite_focal_current_5.15.25.img.xz) to MicroSD Card
 * 2x [buttons](https://www.aliexpress.com/item/32703664513.html)
