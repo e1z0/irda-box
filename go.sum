@@ -1,0 +1,4 @@
+github.com/cyoung/rpi v0.0.0-20170428152236-22a26803e49e h1:jDL3OILCft4R2WB1HVf54R+JE58OY9jFgB+9dAdcync=
+github.com/cyoung/rpi v0.0.0-20170428152236-22a26803e49e/go.mod h1:ve8w1PZKio6kdJXGGFD2azvrKaeR1Bb0qReOR/PYKnY=
+github.com/rogpeppe/rog-go v0.0.0-20210831093509-3c886aea54f1 h1:/OCwqErMqAvGqXRIHZUrPQjvLJ757WSqxnlphaw+9Os=
+github.com/rogpeppe/rog-go v0.0.0-20210831093509-3c886aea54f1/go.mod h1:k0jrzHKdCmJ6zT6iJj0pE0xqilSXprArlMF7cUBMO/w=
