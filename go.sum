@@ -1,4 +1,12 @@
 github.com/cyoung/rpi v0.0.0-20170428152236-22a26803e49e h1:jDL3OILCft4R2WB1HVf54R+JE58OY9jFgB+9dAdcync=
 github.com/cyoung/rpi v0.0.0-20170428152236-22a26803e49e/go.mod h1:ve8w1PZKio6kdJXGGFD2azvrKaeR1Bb0qReOR/PYKnY=
+github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
+github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
+github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWmnc=
+github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
+github.com/lithammer/shortuuid v3.0.0+incompatible h1:NcD0xWW/MZYXEHa6ITy6kaXN5nwm/V115vj2YXfhS0w=
+github.com/lithammer/shortuuid v3.0.0+incompatible/go.mod h1:FR74pbAuElzOUuenUHTK2Tciko1/vKuIKS9dSkDrA4w=
 github.com/rogpeppe/rog-go v0.0.0-20210831093509-3c886aea54f1 h1:/OCwqErMqAvGqXRIHZUrPQjvLJ757WSqxnlphaw+9Os=
 github.com/rogpeppe/rog-go v0.0.0-20210831093509-3c886aea54f1/go.mod h1:k0jrzHKdCmJ6zT6iJj0pE0xqilSXprArlMF7cUBMO/w=

@@ -1,0 +1,306 @@
+ {{template "header" .}}
+
+ <script type="text/javascript">
+    window.onload = function () {
+        var ppp_showing = false;
+        // hook buttons for commands
+        $(".run-handler").click(function(){
+        $('.pppstatus').hide();
+        $('.terminalblock').show();
+        ppp_showing = false;
+        var uid = $(this).data("uid");   
+        $.ajax({
+            type: "POST",
+            url: "/cmd",
+            data: { uid: uid },
+            //success: function(data) { alert('ok: ' + data); },
+            error: function(data) { alert('error: ' + data); },
+            dataType: 'json'
+        });
+        }); 
+        // kill switch button
+        $(".kill-handler").click(function(){
+        $.ajax({
+            type: "POST",
+            url: "/kill",
+            data: { },
+            //success: function(data) { alert('ok: ' + data); },
+            error: function(data) { alert('error: ' + data); },
+            dataType: 'json'
+        });
+        }); 
+        // toggle pp status section
+        $(".ppp-handler").click(function(){
+            if (ppp_showing == false) {
+                ppp_showing = true;
+                $('.terminalblock').hide(1000);
+                $('.pppstatus').show(1000);
+            } else {
+                ppp_showing = false;
+                $('.pppstatus').hide(1000);
+                $('.terminalblock').show(1000);
+            }
+        }); 
+        // ppp start
+        $(".ppp-start").click(function(){
+        $.ajax({
+            type: "POST",
+            url: "/ppp-start",
+            data: { },
+            error: function(data) { alert('error: ' + data); },
+            dataType: 'json'
+        });
+        }); 
+        // ppp stop
+        $(".ppp-stop").click(function(){
+         //   $(".ppp-start").show(1000);
+         //   $(".ppp-stop").hide(1000);
+        $.ajax({
+            type: "POST",
+            url: "/ppp-stop",
+            data: { },
+            error: function(data) { alert('error: ' + data); },
+            dataType: 'json'
+        });
+        }); 
+        // ppp restart
+        $(".ppp-restart").click(function(){
+        $.ajax({
+            type: "POST",
+            url: "/ppp-restart",
+            data: { },
+            error: function(data) { alert('error: ' + data); },
+            dataType: 'json'
+        });
+        }); 
+
+        // enable tooltips
+        $('[data-toggle="tooltip"]').tooltip()
+        // enable shell
+        var shell = $('.shell').resizable({
+    minHeight: 108,
+    minWidth: 250
+}).draggable({
+    handle: '> .status-bar .title'
+});
+
+var commands = {};
+var path = [];
+var term = $('.content').terminal(commands, {
+    greetings: 'Very welcome!',
+    outputLimit: 600,
+    prompt: prompt(),
+    //completion: completion,
+    // detect iframe codepen preview
+    enabled: $('body').attr('onload') === undefined,
+});
+term.greetings = "ojoj";
+// for codepen preview
+if (!term.enabled()) {
+    term.find('.cursor').addClass('blink');
+}
+function prompt(type) {
+    return function(callback) {
+        var prompt;
+        if (type === 'windows') {
+            prompt = 'C:\\' + path.join('\\') + '> ';
+        } else {
+            prompt = 'root@localhost:' + path.join('/') + '# ';
+        }
+        $('.title').html(prompt);
+        callback(prompt);
+    };
+}
+$('#type').on('change', function() {
+    shell.removeClass('osx windows ubuntu default custom').addClass(this.value);
+    term.toggleClass('underline-animation', this.value == 'windows');
+    term.set_prompt(prompt(this.value));
+});
+$('#dark').on('change', function() {
+    shell.removeClass('dark light');
+    if (this.checked) {
+        shell.addClass('dark');
+    } else {
+        shell.addClass('light');
+    }
+});
+$('#type, #dark').on('change', function() {
+    setTimeout(function() {
+        term.focus();
+    }, 400)
+});
+    
+        function appendLog(item) {
+            var doScroll = term.scrollTop > term.scrollHeight - term.clientHeight - 1;
+            term.echo(item);
+            if (doScroll) {
+                term.scrollTop = term.scrollHeight - term.clientHeight;
+            }
+            var count = term.childElementCount;
+            if (count > 20) {
+                 console.log("Overlimit reached, need to remove some items!");
+            }
+        }
+
+        function writePPPStatus(item) {
+           var statusitem =  $('.pppstatusofstatus');
+           statusitem.append('<p class="small">'+item+'</p>');
+           var total = $("blockquote.pppstatusofstatus p").length;
+           //console.log("lenghth: "+total);
+           if (total > 20) {
+            $('.pppstatusofstatus').children().first().remove();
+           }
+        }
+    
+    
+        if (window["WebSocket"]) {
+            conn = new WebSocket("ws://" + document.location.host + "/ws");
+            conn.onclose = function (evt) {
+                appendLog("Connection closed");
+            };
+            conn.onmessage = function (evt) {
+                console.log(evt.data);
+                var json = JSON.parse(evt.data);
+                var messages = json.messages.split('\n');
+                    if (json.running == false) {
+                        $('#process_status').html("No process running");
+                    } else {
+                        $('#process_status').html(json.eta);
+                    }
+                if (json.ppp_status) {    
+                  if (json.ppp_running) {
+                      $("#ppp-alert").html("PPP Is Running");
+                      $("#ppp-alert").attr({class: "alert alert-success"});
+                  } else {
+                      $("#ppp-alert").html("PPP Is not running");
+                      $("#ppp-alert").attr({class: "alert alert-danger"});
+                  } 
+                  var ppp_messages = json.ppp_status.split('\n'); 
+                  for (var i = 0; i < ppp_messages.length; i++) {
+                      writePPPStatus(atob(ppp_messages[i]));
+                  }   
+                }
+                if (json.ppp_running) {
+                    $(".ppp-status-header").html(json.ppp_runtime);
+                    $(".ppp-start").hide(1000);
+                    $(".ppp-stop").show(1000);
+                } else {
+                    $(".ppp-status-header").html("PPP Is not running");
+                    $(".ppp-start").show(1000);
+                    $(".ppp-stop").hide(1000);
+                }
+                
+                //var batteries = json.Batteries;
+                var batteryinfo = '';
+                $.each(json.Batteries, function(key,obj) {
+                        //console.log(obj);
+                        var model_status = 'Level: '+obj.percent+'% Model: '+obj.model+' Status: '+obj.status;
+                        var bat_gen = '<i class="fa fa-battery-empty font-20px fa-battery-filling" aria-hidden="true" style="color: white; padding-left: 2px" data-toggle="tooltip" data-placement="bottom" title="'+model_status+'">'+
+                                      '<span id="result" style="width:calc('+obj.percent+'% * 0.73)"></span>'+
+                                      '</i>';
+                        batteryinfo = batteryinfo + bat_gen;
+                }); 
+                //console.log(batteryinfo);
+                $('#batteries').html(batteryinfo);
+
+                if (json.statusupdate == false) {
+                for (var i = 0; i < messages.length; i++) {
+                    appendLog(atob(messages[i]));
+                }
+            }
+            };
+        } else {
+            var item = document.createElement("div");
+            item.innerHTML = "Your browser does not support WebSockets.";
+            appendLog(item);
+        }
+    };
+ </script>
+
+<div id="ppp-alert" class="alert alert-danger">PPP is not running</div>
+
+    <button type="button" class="btn btn-info ppp-handler" data-toggle="tooltip" data-placement="bottom" title="Toggle status of ppp daemon">
+        <i class="fa fa-wifi"></i> PPP Status
+    </button>  
+   
+    {{ range .Commands }}
+              <button type="button" class="btn {{ .Class }} run-handler" data-toggle="tooltip" data-placement="bottom" title="{{ .Info }}" data-uid="{{ .Uid }}">
+                <i class="fa fa-{{ .Icon }}"></i> {{ .Name }}
+              </button>      
+     {{ end }}
+
+     <button type="button" class="btn btn-danger kill-handler" data-toggle="tooltip" data-placement="bottom" title="Kills currently running app/command">
+        <i class="fa fa-ban"></i> Kill cmd
+    </button>   
+
+
+<br/>
+
+
+    <!-- ppp status -->
+    <div class="pppstatus" style="display:none">
+        <br/>
+        <div class="card">
+            <div class="card-header ppp-status-header">
+              PPP Status
+            </div>
+            <div class="card-body">
+              <!-- <h5 class="card-title">PPP Status and actions</h5> -->
+              <button type="button" class="btn btn-info ppp-start" data-toggle="tooltip" data-placement="bottom" title="Start ppp daemon">
+                <i class="fa fa-wifi"></i> PPP Start
+            </button>  
+            <button type="button" class="btn btn-info ppp-stop" data-toggle="tooltip" data-placement="bottom" title="Stop ppp daemon">
+                <i class="fa fa-wifi"></i> PPP Stop
+            </button>
+            <button type="button" class="btn btn-info ppp-restart" data-toggle="tooltip" data-placement="bottom" title="Restart ppp daemon">
+                <i class="fa fa-wifi"></i> PPP Restart
+            </button>
+              <p class="font-weight-bold">Here are some details:</p>
+              <blockquote class="blockquote mb-0 pppstatusofstatus">
+              </blockquote>
+            </div>
+          </div>
+    </div>
+    <!-- end of ppp status -->
+
+    <!-- terminal block-->
+    <div class="terminalblock">
+        <br/>
+        <div class="alert alert-secondary" id="process_status">
+            No process running
+          </div>
+    <form>
+        <label for="type">Window Type:</label>
+        <select id="type">
+            <option value="osx">osx</option>
+            <option value="ubuntu">ubuntu</option>
+            <option value="windows">windows</option>
+            <option value="custom" selected>custom</option>
+        </select>
+        <label for="dark">dark</label>
+        <input type="checkbox" id="dark" checked/>
+    </form>
+
+    <!-- shell.js terminal window -->
+    <div class="shell custom dark shadow">
+        <div class="status-bar">
+            <div class="buttons">
+                <a href="javascript:;" class="close" title="Close">
+                    <i class="fa fa-times"></i>
+                </a>
+                <a href="javascript:;" class="minimize" title="Minimize">
+                    <i class="fa fa-minus"></i>
+                </a>
+                <a href="javascript:;" class="enlarge" title="Enlarge">
+                    <i class="fa fa-plus"></i>
+                </a>
+            </div>
+            <div class="title">root@localhost: ~</div>
+        </div>
+        <div class="content"></div>
+    </div>
+</div>
+    <!-- Terminal block end -->
+    
+   <br><br><br>
+ {{template "footer" .}}

@@ -1,0 +1,106 @@
+{{ template "header" .}}
+
+<script type="text/javascript">
+       window.onload = function () {
+
+        // hook buttons for commands
+        $(document).on('click', '.new-item' , function() {
+        var VarName = window.prompt("Variable name", "type here variable name");
+        if (VarName != undefined) {
+        var data = '<div class="input-group input-group-sm mb-3 item-blockas">'+
+                   '<div class="input-group-prepend">'+
+                   '<span class="input-group-text" id="inputGroup-sizing-sm" name="variable">'+VarName+'</span>'+
+                   '</div>'+
+                   '<input type="text" name="setting" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">'+
+                   '<button type="button" class="btn btn-danger trash"><i class="fa fa-trash"></i></button>'+
+                   '</div>';
+
+         $("#custom_variables").append(data);           
+         }
+        }); 
+
+        $(document).on('click', '.trash' , function() {
+          $(this).parent("div .item-blockas").remove();
+        });
+
+        // save button
+        $(document).on('click', '.save' , function() {
+          var dv = [];
+          var setting_rootfolder = $('input[name=rootfolder]').val();
+          var setting_captureoutput = $('input[name=captureoutput]').val();
+          var setting_filenamestimestamp = $('input[name=filenametimestampformat]').val();
+          $('input[name=setting]').each(function(){
+            var varas = $(this).closest('div').find('span[name=variable]').html();
+            var setting = $(this).val();
+            dv.push({'variable': varas, 'setting': setting});
+            //console.log(varas+" -> "+setting);
+          });
+
+        $.ajax({
+            type: "POST",
+            url: "/settings",
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({ rootfolder: setting_rootfolder, captureoutput: setting_captureoutput, filenametimestampformat: setting_filenamestimestamp, variables: dv }),
+            success: function(data) { 
+              $('#alert-area').html('<div class="alert alert-success" role="alert">Settings successfully stored!</div>');
+            },
+            error: function(xhr, status, error) { 
+              $('#alert-area').html('<div class="alert alert-danger" role="alert">Error saving: '+xhr.responseText+'!</div>');
+            },
+            dataType: 'json'
+        });
+        clearAlertArea();
+        }); 
+        // enable tooltips
+        $('[data-toggle="tooltip"]').tooltip()
+
+    };
+    </script>
+
+<div class="page-header">
+      <h1>Settings</h1>
+    </div>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Root Folder</span>
+      </div>
+      <input name="rootfolder" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.RootFolder }}">
+    </div>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Capture Output</span>
+      </div>
+      <input name="captureoutput" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.CaptureOutput }}">
+    </div>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">File Names Time Stamp Format</span>
+      </div>
+      <input name="filenametimestampformat" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.FileNameTimeStampFormat }}">
+    </div>
+    
+    <h2>Custom variables</h2>
+    <div id="custom_variables">
+    {{ range .Settings.Variables }}
+   
+    <div class="input-group input-group-sm mb-3 item-blockas">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm" name="variable">{{ .Variable }}</span>
+      </div>
+      <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="setting" value="{{ .Setting }}">
+      <button type="button" class="btn btn-danger trash"><i class="fa fa-trash"></i></button>
+    </div>
+     {{ end }}
+    </div>
+
+     <button type="button" class="btn btn-secondary new-item" data-toggle="tooltip" data-placement="bottom" title="Adds new variable to the list"><i class="fa fa-plus"></i> Add New</button>
+
+
+     <button type="button" class="btn btn-success save" data-toggle="tooltip" data-placement="bottom" title="Saves current settings including the defined variables">
+      <i class="fa fa-save"></i> Save
+  </button>      
+  
+<br/>
+
+<br/>
+{{ template "footer" .}}

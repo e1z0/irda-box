@@ -1,0 +1,209 @@
+{{template "header" .}}
+
+<script type="text/javascript">
+  window.onload = function () {
+              
+        // hook button for new command
+        $(document).on('click', '.new-command' , function() {
+        var data = '<div class="col-sm-12 command-item">'+
+                   '<div class="input-group-prepend">'+
+                   '<input name="command" type="text" class="form-control" placeholder="Command and it\'s parameters for example.: hcxdumptool -i {interface} --force_interface --error_max=200000000 -o {files}/{currentdatetime}.pcapng"/>'+
+                   '<button type="button" class="btn btn-danger trash-command"><i class="fa fa-trash"></i></button>'+
+                   '</div>'+
+                   '</div>';
+        $(this).parent().parent().find('.command-blockas').append(data);
+        });
+        // hook button for application
+        $(document).on('click', '.new-application' , function() {
+        var uuid = generateUUID();  
+        var data = '<div id="application_item" style="border: 2px solid grey; padding: 20px; margin-bottom: 10px">'+
+                   '<div class="input-group item-blockas">'+
+                   '<input name="application_uid" type="text" hidden value="'+uuid+'"></input>'+
+                   '<div class="input-group-prepend">'+
+                   '<span class="input-group-text" id="inputGroup-sizing-sm">Name</span>'+
+                   '</div>'+
+                   '<input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="application_name" placeholder="application name">'+
+                   '<div class="input-group-prepend">'+
+                   '<span class="input-group-text" id="inputGroup-sizing-sm">Class</span>'+
+                   '</div>'+
+                   '<input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="application_class" placeholder="application button appearance class bootstrap v4">'+
+                   '<div class="input-group-prepend">'+
+                   '<span class="input-group-text" id="inputGroup-sizing-sm">Icon</span>'+
+                   '</div>'+
+                   '<input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="application_icon" placeholder="application icon from font awesome v4 without prefix fa-">'+
+                   '<div class="input-group-prepend">'+
+                   '<span class="input-group-text" id="inputGroup-sizing-sm">Info</span>'+
+                   '</div>'+
+                   '<input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="application_info" placeholder="information about application, will be shown in the tooltip">'+
+                   '</div>'+
+                   '<label for="command-blockas">Commands</label>'+
+                   '<div class="input-group mb-3 command-blockas" id="command-blockas">'+
+                   '<div class="col-sm-12 command-item">'+
+                   '<div class="input-group-prepend">'+
+                   '<input name="command" type="text" class="form-control" placeholder="Command and it\'s parameters for example.: hcxdumptool -i {interface} --force_interface --error_max=200000000 -o {files}/{currentdatetime}.pcapng"/>'+
+                   '<button type="button" class="btn btn-danger trash-command"><i class="fa fa-trash"></i></button>'+
+                   '</div>'+
+                   '</div>'+
+                   '</div>'+
+                   '<div class="col-sm-12">'+
+                   '<button type="button" class="btn btn-secondary new-command" data-toggle="tooltip" data-placement="bottom" title="Adds new command"><i class="fa fa-plus"></i> New Command</button>'+
+                   '<button type="button" class="btn btn-danger trash-application" data-toggle="tooltip" data-placement="bottom" title="Deletes current application"><i class="fa fa-trash"></i> Delete this application</button>'+
+                   '</div>'+
+                   '</div>';
+         $("#applications-block").append(data);           
+         
+        }); 
+
+        $(document).on('click', '.trash-command' , function() {
+          $(this).closest('.command-item').remove();
+          //$(this).parent().parent().remove();
+        });
+
+        $(document).on('click', '.trash-application' , function() {
+          $(this).closest('#application_item').remove();
+         // $(this).parent("div .item-blockas").remove();
+        });
+
+        // save button
+        $(document).on('click', '.save' , function() {
+          var dv = [];
+          $('div #application_item').each(function(){
+            var uid = $(this).closest('div').find('input[name=application_uid]').val();
+            var name = $(this).closest('div').find('input[name=application_name]').val();
+            var claz = $(this).closest('div').find('input[name=application_class]').val(); 
+            var icon = $(this).closest('div').find('input[name=application_icon]').val();
+            var info = $(this).closest('div').find('input[name=application_info]').val();  
+            var comms = Array();
+            $(this).closest('div').find('.command-item').each(function() {
+              //var com = $(this).closest('div').find('input[name=command]').val().split(' ');    
+              // new implementation Split string into words with whitespace unless in between a pair of double quotation marks
+              var str = $(this).closest('div').find('input[name=command]').val();
+              var com = [].concat.apply([], str.split('"').map(function(v,i){
+                    return i%2 ? v : v.split(' ')
+              })).filter(Boolean);
+              // fix special chars
+              // $(com).each(function(entry, value) {
+              //   com[entry] = value.toString().replace(/\u003e\u003e/g, '>>');
+              // });
+              // strip all possible spaces if present
+              // $(com).each(function(entry, value) {
+              //   com[entry] = value.toString().replace(/\s+/g, '');
+              // });
+              comms.push(com);
+            });
+            dv.push({'uid': uid, 'name': name, 'class': claz, 'icon': icon, 'info': info, 'commands': comms});
+          });
+          console.log(dv);
+
+        $.ajax({
+            type: "POST",
+            url: "/commands",
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(dv),
+            success: function(data) { 
+              $('#alert-area').html('<div class="alert alert-success" role="alert">Settings successfully stored!</div>');
+            },
+            error: function(xhr, status, error) { 
+              $('#alert-area').html('<div class="alert alert-danger" role="alert">Error saving: '+xhr.responseText+'!</div>');
+            },
+            dataType: 'json'
+        });
+        scrollToTop();
+        clearAlertArea();
+        }); 
+
+
+
+};
+</script>
+<!-- WEB PAGE CONTENT -->
+
+
+    <div class="page-header">
+      <h1>Applications</h1>
+    </div>
+      <div class="form-group" id="applications-block">
+    {{ range .Commands }}
+    <div id="application_item" style="border: 2px solid grey; padding: 20px; margin-bottom: 10px">
+    <div class="input-group item-blockas">
+      <input name="application_uid" type="text" hidden value="{{ .Uid }}"></input>
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+      </div>
+      <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="application_name" value="{{ .Name }}" placeholder="application name">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Class</span>
+      </div>
+      <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="application_class" value="{{ .Class }}" placeholder="application button appearance class bootstrap v4">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Icon</span>
+      </div>
+      <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="application_icon" value="{{ .Icon }}" placeholder="application icon from font awesome v4 without prefix fa-">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Info</span>
+      </div>
+      <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" name="application_info" value="{{ .Info }}" placeholder="information about application, will be shown in the tooltip">
+    </div>
+      <label for="command-blockas">Commands</label>
+      <div class="input-group mb-3 command-blockas" id="command-blockas">
+       {{ range  $element := .Commands }}
+       <div class="col-sm-12 command-item">
+       <div class="input-group-prepend">
+       <input name="command" type="text" class="form-control" placeholder="Command and it\'s parameters for example.: hcxdumptool -i {interface} --force_interface --error_max=200000000 -o {files}/{currentdatetime}.pcapng" value="{{ StringsJoin $element " " }}"/>       
+       <button type="button" class="btn btn-danger trash-command"><i class="fa fa-trash"></i></button>
+      </div>
+      </div>
+       {{ end }}
+      </div>
+      <div class="col-sm-12">
+        <button type="button" class="btn btn-secondary new-command" data-toggle="tooltip" data-placement="bottom" title="Adds new command"><i class="fa fa-plus"></i> New Command</button>
+        <button type="button" class="btn btn-danger trash-application" data-toggle="tooltip" data-placement="bottom" title="Deletes current application"><i class="fa fa-trash"></i> Delete this application</button>
+      </div>
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-header">
+            Variables: 
+          </div>
+
+        <div id="accordion">
+          {{ range $.Variables }}
+        <div class="card">
+            <div class="card-header" id="headingOne">
+              <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  {{ .Variable }}
+                </button>
+              </h5>
+            </div>
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+              <div class="card-body">
+                {{ .Setting }}
+              </div>
+            </div>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+      </div>
+    </div>
+     {{ end }}
+    </div>
+
+
+     <button type="button" class="btn btn-secondary new-application" data-toggle="tooltip" data-placement="bottom" title="Adds new application"><i class="fa fa-plus"></i> New Application</button>
+
+
+     <button type="button" class="btn btn-success save" data-toggle="tooltip" data-placement="bottom" title="Saves all declared commands">
+      <i class="fa fa-save"></i> Save
+  </button>      
+  
+<br/>
+
+<br/>
+
+
+
+
+  <!-- END OF WEB PAGE CONTENT -->
+
+  {{template "footer" .}}

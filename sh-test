@@ -1,0 +1,10 @@
+#!/bin/sh
+
+COUNTER=0
+while :
+do
+        COUNTER=$((COUNTER+1))
+	echo Keep running $COUNTER
+	echo "Press CTRL+C to exit"
+	sleep 3
+done

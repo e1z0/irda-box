@@ -1,0 +1,300 @@
+{{define "header"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charSet="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="Another way to discover WPA handshakes!" />
+<meta name="docsearch:language" content="en" />
+<meta property="og:title" content="WPA Capture Portal" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="an image url that exist in your page" />
+<meta property="og:url" content="https://github.com/e1z0/web-capture-portal" />
+<meta property="og:description" content="Another way to discover WPA handshakes!" />
+<title>{{ .Title }}</title>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="/static/css/jquery.terminal.min.css">
+<link rel='stylesheet' href='/static/css/shell.min.css'>
+<link rel='stylesheet' href='/static/css/jquery-ui.css'>
+<link rel="stylesheet" href="/static/css/font-awesome.min.css">
+<link rel="stylesheet" href="/static/css/bootstrap.min.css ">
+<!-- jQuery/JS libraries -->
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/popper.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/jquery.terminal.min.js "></script>
+<script src='/static/js/jquery-ui.min.js'></script>
+
+
+
+
+
+
+<!-- Termynal shell css -->
+<style>
+form {
+    margin: 10px;
+}
+body .shell {
+    width: 800px;
+    height: 400px;
+}
+body .shell .terminal {
+    height: calc(100% - 29px);
+    --size: 1.1;
+    /*
+     * padding bottom 0 on terminal and margin
+     * on .cmd will be in version 2.0.1
+     * that fixes FireFox issue
+     */
+    padding-bottom: 0;
+}
+body .shell .terminal .cmd {
+    margin-bottom: 10px;
+}
+.shell .typed-cursor, .shell .cursor {
+    background: transparent;
+}
+.shell > .status-bar .title {
+    cursor: move;
+}
+.shell .status-bar {
+    /* hack and should be removed ASAP since the full workaround is available */
+    height: 31px;
+}
+/*
+ * fix to shell.js to center title to free space
+ */
+.shell.windows .status-bar .title {
+    right: 106px;
+    height: 31px;
+}
+@supports (--css: variables) {
+    .shell .terminal {
+        --color: #aaa;
+        width: 100%;
+    }
+    .shell.ubuntu .terminal {
+        --background: #300924;
+        width: 100%;
+    }
+    .shell.osx .content.terminal {
+        --background: #222;
+        width: 100%;
+    }
+    .shell.light .content.terminal {
+        --background: white;
+        --color: black;
+    }
+    /*
+    * windows and custom are the last ones so
+    * they don't get overwritten by light
+    */
+    .shell.windows .content.terminal {
+        --background: black;
+        --color: white;
+        --animation: terminal-underline;
+    }   
+    .shell.custom .content.terminal {
+        --background: #292929;
+        --color: #aaa;
+    }
+}
+/*
+ * overwrite shell.js style because shell.js   
+ * selectors are stronger then terminal ones
+ */
+.cmd span.cursor {
+    animation: none;
+    width: auto;
+    background-color: var(--background, #000);
+}
+.shell:not(.light) terminal.content,
+.shell.osx.dark .content,
+.shell.ubuntu:not(.light) .content {
+    background-color: var(--background, #222) !important;
+}
+.shell .terminal.content {
+    font-size: 12px;
+}
+.cmd {
+    background-color: inherit;
+}
+@supports (--css: variables) {
+    .shell .terminal.content {
+        font-size: calc(var(--size, 1) * 12px);
+    }
+}
+/* fix for Firefox */
+.terminal > .resizer, .terminal > .font .resizer {
+    visibility: visible;
+    pointer-events: none;
+}
+.terminal::-webkit-scrollbar-track
+{
+	border: 1px solid var(--color, #aaa);
+	background-color: var(--background);
+}
+.terminal::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: var(--background);
+}
+.terminal::-webkit-scrollbar-thumb
+{
+	background-color: var(--color, #aaa);
+}
+/* battery stuff */
+.font-20px{font-size: 20px!important;}
+.font-50px{font-size: 50px!important;}
+.font-70px{font-size: 70px!important;}
+
+.fa-battery-filling{
+  position: relative;
+}
+.fa-battery-filling span{
+  position: absolute;
+  background: orange;
+  top: 28%;
+  height: 44%;
+  left: 11%;
+  border-radius: 2px;
+  transition: 250ms ease;
+}
+.fa-battery-filling [style="width:calc(1% * 0.73)"],
+.fa-battery-filling [style="width:calc(2% * 0.73)"], 
+.fa-battery-filling [style="width:calc(3% * 0.73)"], 
+.fa-battery-filling [style="width:calc(4% * 0.73)"], 
+.fa-battery-filling [style="width:calc(5% * 0.73)"], 
+.fa-battery-filling [style="width:calc(6% * 0.73)"], 
+.fa-battery-filling [style="width:calc(7% * 0.73)"], 
+.fa-battery-filling [style="width:calc(8% * 0.73)"], 
+.fa-battery-filling [style="width:calc(9% * 0.73)"], 
+.fa-battery-filling [style="width:calc(10% * 0.73)"],
+.fa-battery-filling [style="width:calc(11% * 0.73)"],
+.fa-battery-filling [style="width:calc(12% * 0.73)"],
+.fa-battery-filling [style="width:calc(13% * 0.73)"],
+.fa-battery-filling [style="width:calc(14% * 0.73)"],
+.fa-battery-filling [style="width:calc(15% * 0.73)"],
+.fa-battery-filling [style="width:calc(16% * 0.73)"],
+.fa-battery-filling [style="width:calc(17% * 0.73)"],
+.fa-battery-filling [style="width:calc(18% * 0.73)"],
+.fa-battery-filling [style="width:calc(19% * 0.73)"],
+.fa-battery-filling [style="width:calc(20% * 0.73)"]{
+  background: red;
+}
+.fa-battery-filling [style="width:calc(90% * 0.73)"],
+.fa-battery-filling [style="width:calc(91% * 0.73)"],
+.fa-battery-filling [style="width:calc(92% * 0.73)"],
+.fa-battery-filling [style="width:calc(93% * 0.73)"],
+.fa-battery-filling [style="width:calc(94% * 0.73)"],
+.fa-battery-filling [style="width:calc(95% * 0.73)"],
+.fa-battery-filling [style="width:calc(96% * 0.73)"],
+.fa-battery-filling [style="width:calc(97% * 0.73)"],
+.fa-battery-filling [style="width:calc(98% * 0.73)"],
+.fa-battery-filling [style="width:calc(99% * 0.73)"],
+.fa-battery-filling [style="width:calc(100% * 0.73)"]{
+  background: rgba(235, 238, 235, 0.919);
+}
+</style>
+<!-- Terminal shell end -->
+
+<!-- Our logic -->
+<script type="text/javascript">
+   $(document).ready(function () {
+    // enable tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+        function refresh() {
+          setTimeout(function() {
+                location.reload();
+                }, 2000);
+          }
+
+          function clearAlertArea() {
+            scrollToTop();
+            setTimeout(function() {
+                $('#alert-area').html("");
+                }, 5000);
+          }
+
+          function scrollToTop() {
+            window.scrollTo(0, 0);
+        }
+
+          function generateUUID() { // Public Domain/MIT
+            var d = new Date().getTime();//Timestamp
+            var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16;//random number between 0 and 16
+                if(d > 0){//Use timestamp until depleted
+                  r = (d + r)%16 | 0;
+                  d = Math.floor(d/16);
+                } else {//Use microseconds since page-load if supported
+                  r = (d2 + r)%16 | 0;
+                  d2 = Math.floor(d2/16);
+                }
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+          }  
+
+        
+      
+    </script>
+<!-- End of our logic -->
+
+</head>
+<body>
+<!-- Navigation -->
+  <!--<nav class="navbar navbar-default navbar-expand-lg navbar-dark bg-dark fixed-top">-->
+  <nav class="navbar navbar-default navbar-expand-lg navbar-dark bg-dark navbar-centered">
+
+    <div class="container">
+      <a class="navbar-brand" href="/">IrDA Box</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+            <!--
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+        -->
+        <li class="nav-item batteries" id="batteries" style="padding: 6px">
+          
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/commands">Commands</a>
+        </li>
+      <li class="nav-item">
+          <a class="nav-link" href="/settings">Settings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+          <!--
+          <li class="nav-item">
+            <a class="nav-link" href="#">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+          </li>-->
+        </ul>
+      </div>
+    </div>
+  </nav>
+ <!-- Page Content -->
+  <div class="container">
+    <br/>
+
+    <!-- icons: https://fontawesome.com/v4/icons/#new -->
+    
+    <div id="alert-area"></div>
+
+    <br/>
+{{ end }}
