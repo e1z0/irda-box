@@ -8,11 +8,12 @@ import (
 	"os/exec"
 	"syscall"
 	"time"
+        "strings"
 )
 
 var PPPExecution *exec.Cmd
-var ppp_bin = ""
-var ppp_args = ""
+//var ppp_bin = ""
+//var ppp_args = ""
 
 type PPP struct {
 	PPPBinary string
@@ -31,23 +32,28 @@ func PPPRuntime() string {
 
 func StartPPP() {
 	if !PPPDaemon.running {
+//                var mergedParams []string
+//                var userparams []string
+                userparams := strings.Split(settings.PPPSettings.Command," ")
+                mergedParams := append(PPPDaemon.PPPArgs,userparams...)
 		pppwriter([]byte(fmt.Sprintf("Launching application: %s\n", PPPDaemon.PPPBinary)))
-		pppwriter([]byte(fmt.Sprintf("We are now trying to run the command: %s with params: %v\n", PPPDaemon.PPPBinary, PPPDaemon.PPPArgs)))
-		log.Printf("Run command %s with parameters %v\n", PPPDaemon.PPPBinary, PPPDaemon.PPPArgs)
-		PPPExecution = exec.Command(PPPDaemon.PPPBinary, PPPDaemon.PPPArgs...)
+		pppwriter([]byte(fmt.Sprintf("We are now trying to run the command: %s with params: %v\n", PPPDaemon.PPPBinary, mergedParams)))
+		log.Printf("Run command %s with parameters %v\n", PPPDaemon.PPPBinary, mergedParams)
+		PPPExecution = exec.Command(PPPDaemon.PPPBinary, mergedParams...)
+                PPPExecution.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
 		stdout, err := PPPExecution.StdoutPipe()
 		if err != nil {
-			log.Println(err)
+			log.Printf("PPP Exec stdout capture error: %s\n",err)
 			return
 		}
 		stderr, err := PPPExecution.StderrPipe()
 		if err != nil {
-			log.Println(err)
+			log.Printf("PPP Exec stderr capture error: %s\n",err)
 			return
 		}
 
 		if err := PPPExecution.Start(); err != nil {
-			log.Println(err)
+                        log.Printf("PPP Execute error: %s\n",err)
 			return
 		}
 		PPPDaemon.running = true
@@ -56,7 +62,9 @@ func StartPPP() {
 		s := bufio.NewScanner(io.MultiReader(stdout, stderr))
 		for s.Scan() {
 			log.Println(string(s.Bytes()))
+                        if len(string(s.Bytes())) > 0 {
 			go pppwriter(s.Bytes())
+                        }
 		}
 
 		exit_code := 0
@@ -65,7 +73,7 @@ func StartPPP() {
 			if exitError, ok := err.(*exec.ExitError); ok {
 				exit_code = exitError.ExitCode()
 			}
-			log.Println(err)
+                        log.Printf("PPP Execution finished: %s\n",err)
 		}
 		PPPDaemon.running = false
 		ppp_broadcast <- []byte(fmt.Sprintf("PPP Process exited (%d)!", exit_code))

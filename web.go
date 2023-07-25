@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
+        
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -190,6 +190,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+log.Printf("new settings: %#v\n",sets)
 		settings = sets
 		err = saveSettings()
 		if err != nil {
@@ -205,7 +206,11 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 			Title    string
 			Footer   string
 			Settings Settings
+                        Ifaces   []Iface
+                        IrcommFaces []string
 		}
+                ifaces,_ := ListInterfaces()
+                comfaces, _ := ReturnIrcommIfaces()
 		t, err := template.New("settings.html").Funcs(template.FuncMap{
 			"StringsJoin": strings.Join,
 		}).ParseFiles("tpl/settings.html")
@@ -215,7 +220,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Printf("Unable to parse template: %s\n", err)
 		}
-		err = t.ExecuteTemplate(w, "settings.html", HtmlStruct{Name: static_variables.Name, Title: "Settings", Footer: static_variables.Footer, Settings: settings})
+		err = t.ExecuteTemplate(w, "settings.html", HtmlStruct{Name: static_variables.Name, Title: "Settings", Footer: static_variables.Footer, Settings: settings, Ifaces: ifaces, IrcommFaces: comfaces})
 		if err != nil {
 			log.Printf("Error when parsing html template: %s\n", err)
 			http.Error(w, "Internal Server Error", 500)

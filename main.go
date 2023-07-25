@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+//	"fmt"
 	"log"
 	"os"
 	"time"
@@ -12,10 +12,34 @@ import (
 
 var (
 	ENABLE_GPIO = "false"
+        REQUIRED_BINS = []string{"ps","w","irdadump","pppd","lsmod","modprobe"}
 )
 
 func init() {
-	PPPDaemon = PPP{PPPBinary: "./sh-test"}
+        CheckRequiredBins()
+        pppbin,err := ReturnBinPath("pppd")
+        if err != nil {
+            log.Printf("Unable to find ppp binary, make sure you have install all required tools to run this application\n")
+            log.Printf("Type ./irda -install to install all required software\n")
+        }
+	PPPDaemon = PPP{PPPBinary: pppbin, PPPArgs: []string{"call", "irda"}}
+        // testing
+//        PPPDaemon.PPPBinary = "./sh-test"
+        ircomms, err := ReturnIrcommIfaces()
+        if err != nil || len(ircomms) == 0 {
+          log.Printf("No IrCOMM interfaces where found, the ircomm-tty kernel module is not loaded!\n")
+          ok, err := ModProbe("ircomm-tty")
+          if ok && err == nil {
+              log.Printf("ircomm-tty kernel module have been loaded\n")
+          } else {
+              log.Printf("Unable to load ircomm-tty module: %s\n",err)
+          }
+        }
+        ircomms,_ = ReturnIrcommIfaces()
+        if len(ircomms) > 0 {
+          log.Printf("IrCOMM interfaces: %d\n",len(ircomms))
+        }
+
 	if ENABLE_GPIO == "true" {
 		WiringPiSetup()
 		initializeLeds()
@@ -26,26 +50,26 @@ func TestLeds() {
 	if ENABLE_GPIO == "true" {
 		for {
 			for _, led := range leds {
-				fmt.Printf("up led: %s\n", led.Color)
+				log.Printf("up led: %s\n", led.Color)
 				led.On()
 				time.Sleep(2 * time.Second)
-				fmt.Printf("down led: %s\n", led.Color)
+				log.Printf("down led: %s\n", led.Color)
 				led.Off()
 				time.Sleep(2 * time.Second)
 				time.Sleep(1 * time.Second)
 			}
 		}
 	} else {
-		fmt.Printf("Gpio support is not compiled in\n")
+		log.Printf("Gpio support is not compiled in\n")
 	}
 }
 
 func main() {
-	fmt.Printf("Launched!\n")
+	log.Printf("Program launched!\n")
 	testleds := flag.Bool("testleds", false, "Test leds only")
 	flag.Parse()
 	if *testleds {
-		fmt.Printf("Leds tests mode\n")
+		log.Printf("Leds tests mode\n")
 		TestLeds()
 		os.Exit(0)
 	}

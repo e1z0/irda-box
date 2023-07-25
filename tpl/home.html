@@ -168,23 +168,20 @@ $('#type, #dark').on('change', function() {
                         $('#process_status').html(json.eta);
                     }
                 if (json.ppp_status) {    
-                  if (json.ppp_running) {
-                      $("#ppp-alert").html("PPP Is Running");
-                      $("#ppp-alert").attr({class: "alert alert-success"});
-                  } else {
-                      $("#ppp-alert").html("PPP Is not running");
-                      $("#ppp-alert").attr({class: "alert alert-danger"});
-                  } 
                   var ppp_messages = json.ppp_status.split('\n'); 
                   for (var i = 0; i < ppp_messages.length; i++) {
                       writePPPStatus(atob(ppp_messages[i]));
                   }   
-                }
+                  }
                 if (json.ppp_running) {
+                    $("#ppp-alert").html("PPP Is Running");
+                    $("#ppp-alert").attr({class: "alert alert-success"});
                     $(".ppp-status-header").html(json.ppp_runtime);
                     $(".ppp-start").hide(1000);
                     $(".ppp-stop").show(1000);
                 } else {
+                    $("#ppp-alert").html("PPP Is not running");
+                    $("#ppp-alert").attr({class: "alert alert-danger"});
                     $(".ppp-status-header").html("PPP Is not running");
                     $(".ppp-start").show(1000);
                     $(".ppp-stop").hide(1000);

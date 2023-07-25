@@ -26,9 +26,15 @@
         // save button
         $(document).on('click', '.save' , function() {
           var dv = [];
-          var setting_rootfolder = $('input[name=rootfolder]').val();
-          var setting_captureoutput = $('input[name=captureoutput]').val();
-          var setting_filenamestimestamp = $('input[name=filenametimestampformat]').val();
+          var setting_wifiiface = $('select[name=wifiiface]').val();
+          var setting_ppp_iface = $('select[name=ppp_ircomiface]').val();
+          var setting_ppp_speed = Number($('input[name=ppp_speed]').val());
+          var setting_ppp_command = $('input[name=ppp_command]').val();
+          var setting_ppp_options = $('textarea[name=ppp_options]').val();
+          var setting_ppp_connect = $('textarea[name=ppp_connect]').val();
+          var setting_ppp_disconnect = $('textarea[name=ppp_disconnect]').val();
+          var pppsettings = { ircomm: setting_ppp_iface, speed: setting_ppp_speed, ppp_command: setting_ppp_command, options: setting_ppp_options, connect: setting_ppp_connect, disconnect: setting_ppp_disconnect};
+          var setting_timestamp = $('input[name=timestampformat]').val();
           $('input[name=setting]').each(function(){
             var varas = $(this).closest('div').find('span[name=variable]').html();
             var setting = $(this).val();
@@ -40,7 +46,7 @@
             type: "POST",
             url: "/settings",
             contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify({ rootfolder: setting_rootfolder, captureoutput: setting_captureoutput, filenametimestampformat: setting_filenamestimestamp, variables: dv }),
+            data: JSON.stringify({ wifi_interface: setting_wifiiface, ppp_settings: pppsettings,timestampformat: setting_timestamp, variables: dv }),
             success: function(data) { 
               $('#alert-area').html('<div class="alert alert-success" role="alert">Settings successfully stored!</div>');
             },
@@ -62,21 +68,62 @@
     </div>
     <div class="input-group input-group-sm mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text" id="inputGroup-sizing-sm">Root Folder</span>
+        <span class="input-group-text" id="inputGroup-sizing-sm">Wifi interface</span>
       </div>
-      <input name="rootfolder" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.RootFolder }}">
+      <select class="form-control" name="wifiiface" value="{{ .Settings.WifiIface }}"> 
+           {{ range .Ifaces }}
+             <option {{ if eq $.Settings.WifiIface .Name }} selected="selected"{{ end }}>{{ .Name }}</option>
+           {{ end }}
+      </select>
+    </div>
+    <h2>PPP Settings</h2>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">IrCOMM interface</span>
+      </div>
+      <select name="ppp_ircomiface" class="form-control">
+           {{ range .IrcommFaces }}
+             <option {{ if eq $.Settings.PPPSettings.IrComm . }} selected="selected"{{ end }}>{{ . }}</option>
+           {{ end }}
+      </select>
+
     </div>
     <div class="input-group input-group-sm mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text" id="inputGroup-sizing-sm">Capture Output</span>
+        <span class="input-group-text" id="inputGroup-sizing-sm">Serial speed baud</span>
       </div>
-      <input name="captureoutput" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.CaptureOutput }}">
+      <input name="ppp_speed" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.PPPSettings.Speed }}">
     </div>
     <div class="input-group input-group-sm mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text" id="inputGroup-sizing-sm">File Names Time Stamp Format</span>
+        <span class="input-group-text" id="inputGroup-sizing-sm">PPP Daemon parameters</span>
       </div>
-      <input name="filenametimestampformat" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.FileNameTimeStampFormat }}">
+      <input name="ppp_command" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.PPPSettings.Command }}">
+    </div>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">PPP settings</span>
+      </div>
+       <textarea class="form-control" name="ppp_options" rows="10" aria-label="Small" aria-describedby="inputGroup-sizing-sm">{{ .Settings.PPPSettings.Options }}</textarea>
+    </div>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">PPP Connect script</span>
+      </div>
+       <textarea class="form-control" name="ppp_connect" rows="10" aria-label="Small" aria-describedby="inputGroup-sizing-sm">{{ .Settings.PPPSettings.Connect }}</textarea>
+    </div>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">PPP Disconnect script</span>
+      </div>
+       <textarea class="form-control" name="ppp_disconnect" rows="10" aria-label="Small" aria-describedby="inputGroup-sizing-sm">{{ .Settings.PPPSettings.Disconnect }}</textarea>
+    </div>
+
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Time Stamp Format</span>
+      </div>
+      <input name="timestampformat" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{ .Settings.TimeStampFormat }}">
     </div>
     
     <h2>Custom variables</h2>

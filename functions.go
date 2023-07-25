@@ -11,12 +11,30 @@ import (
 	"strconv"
 	"strings"
 	"time"
+        "net"
+        "regexp"
+        "path/filepath"
+        "os/exec"
+        "errors"
 )
+
 
 func ReturnTimePrefix() string {
 	dt := time.Now()
-	return dt.Format(settings.FileNameTimeStampFormat)
+	return dt.Format(settings.TimeStampFormat)
 }
+
+func ReturnIrcommIfaces() ([]string,error) {
+//  var comfaces []string
+  pattern := "/dev/ircomm*"
+  files, err := filepath.Glob(pattern)
+  if err != nil {
+    fmt.Printf("No ircomm device nodes where found\n")
+  }
+  return files,nil
+//return comfaces,nil
+}
+
 
 type SiteInfo struct {
 	Name   string
@@ -141,4 +159,78 @@ func fmtDuration(d time.Duration) string {
 	d -= h * time.Hour
 	m := d / time.Minute
 	return fmt.Sprintf("%02d:%02d", h, m)
+}
+
+type Iface struct {
+Name string
+Mac string
+Ips []string
+}
+
+// List interfaces will return an interface list with name, mac and ip addresses
+func ListInterfaces() ([]Iface,error) {
+  var ifaces []Iface
+  ifs,err := net.Interfaces()
+  if err != nil {
+    return ifaces,err
+  }
+  for _,ifi := range ifs {
+    var re = regexp.MustCompile(`veth|docker|lo`)
+    if re.MatchString(ifi.Name) { continue }
+    ifobj := Iface{Name: ifi.Name, Mac: fmt.Sprintf("%s",ifi.HardwareAddr)}
+    addrs,_ := ifi.Addrs()
+    for _, addr := range addrs {
+      ip,_,_ := net.ParseCIDR(fmt.Sprintf("%s",addr))
+      ifobj.Ips = append(ifobj.Ips,fmt.Sprintf("%s",ip))
+    }
+    ifaces =  append(ifaces,ifobj)
+    }
+  return ifaces,nil
+}
+
+func ModProbe(module string) (bool,error) {
+ cmd := exec.Command("modprobe", module)
+ if err := cmd.Run() ; err != nil {
+    if exitError, ok := err.(*exec.ExitError); ok {
+        return false,exitError // exitError.ExitCode()
+    }
+ } else {
+   return true,nil
+ }
+ return false,errors.New("Unknown error")
+}
+
+func CheckBinaryPresence(bin string) bool {
+        _, err := exec.LookPath(bin)
+        if err != nil {
+            return false
+        }
+        return true
+}
+
+func ReturnBinPath(bin string) (string,error) {
+        path, err := exec.LookPath(bin)
+        if err != nil {
+            return "",err
+        }
+        return path,nil
+}
+
+func CheckRequiredBins() {
+  total_bins := len(REQUIRED_BINS)
+  found_bins := 0
+  for _,bin := range REQUIRED_BINS {
+    fmt.Printf("Checking if binary: %s exists: ",bin)
+    if CheckBinaryPresence(bin) {
+      found_bins++
+      fmt.Printf("yes\n")
+    } else {
+      fmt.Printf("no\n")
+    }
+  }
+  if found_bins >= total_bins {
+  fmt.Printf("All bins where found\n")
+  } else {
+  fmt.Printf("Some required bins are missing!\n")
+  }
 }
