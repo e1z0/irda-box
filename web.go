@@ -5,9 +5,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
-        
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -263,7 +264,12 @@ func commandsHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Printf("Unable to parse template: %s\n", err)
 		}
-		err = t.ExecuteTemplate(w, "commands.html", HtmlStruct{Name: static_variables.Name, Title: "Commands", Footer: static_variables.Footer, Commands: Commands, Variables: settings.Variables})
+		var vars []Variables
+		vars = append(vars,Variables{Variable: "{interface}", Setting: settings.WifiIface})
+		vars = append(vars,Variables{Variable: "{ircomm}", Setting: settings.PPPSettings.IrComm})
+		vars = append(vars,Variables{Variable: "{speed}", Setting: strconv.Itoa(settings.PPPSettings.Speed)})
+		vars = append(vars,settings.Variables...)
+		err = t.ExecuteTemplate(w, "commands.html", HtmlStruct{Name: static_variables.Name, Title: "Commands", Footer: static_variables.Footer, Commands: Commands, Variables: vars})
 		if err != nil {
 			log.Printf("Error when parsing html template: %s\n", err)
 			http.Error(w, "Internal Server Error", 500)
@@ -313,12 +319,13 @@ func ppp_broadcaster() {
 			if !socketLock {
 				socketLock = true
 				err := client.WriteJSON(msg)
-				socketLock = false
 				if err != nil {
-					log.Printf("Websocket error: %s", err)
+					log.Printf("PPP Broadcaster Websocket error: %s", err)
 					client.Close()
 					delete(clients, client)
 				}
+				socketLock = false
+
 			}
 		}
 	}
@@ -342,12 +349,13 @@ func broadcaster() {
 			if !socketLock {
 				socketLock = true
 				err := client.WriteJSON(msg)
-				socketLock = false
 				if err != nil {
 					log.Printf("Websocket error: %s", err)
 					client.Close()
 					delete(clients, client)
 				}
+				socketLock = false
+
 			}
 		}
 	}

@@ -4,18 +4,18 @@ import (
 	"bytes"
 	"encoding/gob"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
-        "net"
-        "regexp"
-        "path/filepath"
-        "os/exec"
-        "errors"
 )
 
 
@@ -233,4 +233,12 @@ func CheckRequiredBins() {
   } else {
   fmt.Printf("Some required bins are missing!\n")
   }
+}
+
+func ChmodFile(file string, mode os.FileMode) (bool,error) {
+	err := os.Chmod(file, mode)
+    if err != nil {
+		return false,err
+    }
+	return true,nil
 }

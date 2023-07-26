@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-//	"fmt"
+	//	"fmt"
 	"log"
 	"os"
 	"time"
@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ENABLE_GPIO = "false"
+	ENABLE_GPIO = "true"
         REQUIRED_BINS = []string{"ps","w","irdadump","pppd","lsmod","modprobe"}
 )
 

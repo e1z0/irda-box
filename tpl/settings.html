@@ -4,6 +4,19 @@
        window.onload = function () {
 
         // hook buttons for commands
+        $(document).on('click','.autogen', function() {
+var command_predefined = "debug dump";
+var options_predefined = "noauth\ndebug\nkdebug 255\nnodetach\nnocrtscts\npersist\nmaxfail 0\nholdoff 1\ndeflate 15,15\npassive\nlocal\n192.168.55.100:192.168.55.101\nnetmask 255.255.255.0\nms-dns 1.1.1.1";
+var connect_predefined = '#!/bin/bash\nread -n 5 i\necho "CLIENTSERVER"\niptables -t nat -A POSTROUTING -o {interface} -j MASQUERADE';
+var disconnect_predefined = "#!/bin/bash\niptables -t nat -D POSTROUTING -o {interface} -j MASQUERADE";
+$('input[name=ppp_command]').val(command_predefined);
+$('textarea[name=ppp_options]').val(options_predefined);
+$('textarea[name=ppp_connect]').val(connect_predefined);
+$('textarea[name=ppp_disconnect]').val(disconnect_predefined);
+$('#alert-area').html('<div class="alert alert-success" role="alert">Settings auto-generated!</div>');
+        });
+
+
         $(document).on('click', '.new-item' , function() {
         var VarName = window.prompt("Variable name", "type here variable name");
         if (VarName != undefined) {
@@ -140,12 +153,16 @@
      {{ end }}
     </div>
 
-     <button type="button" class="btn btn-secondary new-item" data-toggle="tooltip" data-placement="bottom" title="Adds new variable to the list"><i class="fa fa-plus"></i> Add New</button>
+     <button type="button" class="btn btn-primary new-item" data-toggle="tooltip" data-placement="bottom" title="Adds new variable to the list"><i class="fa fa-plus"></i> Add New</button>
 
 
      <button type="button" class="btn btn-success save" data-toggle="tooltip" data-placement="bottom" title="Saves current settings including the defined variables">
       <i class="fa fa-save"></i> Save
   </button>      
+
+  <button type="button" class="btn btn-secondary autogen" data-toggle="tooltip" data-placement="bottom" title="Automatically generate optimal settings">
+    <i class="fa fa-car"></i> Auto generate
+</button>    
   
 <br/>
 

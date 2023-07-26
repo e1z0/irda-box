@@ -13,6 +13,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
 	"github.com/lithammer/shortuuid"
 )
 
@@ -134,7 +135,9 @@ func ReplaceCommandVariables(params []string, uuid string) []string {
 		// static variables
 		TextReplacer := strings.NewReplacer(
 			"{datetimenow}", ReturnTimePrefix(),
-			//"\u003e", ">>",
+			"{interface}", settings.WifiIface,
+			"{ircomm}", settings.PPPSettings.IrComm,
+			"{speed}", string(settings.PPPSettings.Speed),
 			"{uuid}", uuid,
 		)
 		params[i] = TextReplacer.Replace(params[i])

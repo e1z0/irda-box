@@ -1,8 +1,7 @@
 package main
 
-
 import (
-      . "github.com/cyoung/rpi"
+	. "github.com/cyoung/rpi"
 )
 
 var (
@@ -20,6 +19,18 @@ Pin int
 Name string
 State bool
 Color string
+}
+
+func TurnLed(color string, state bool) {
+      for _, led := range leds {
+         if led.Color == color {
+            if state {
+               led.On()
+            } else {
+               led.Off()
+            }
+         }
+      }
 }
 
 func (l *Led) On() {
