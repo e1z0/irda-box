@@ -108,6 +108,27 @@ func GenPPPConfigs() (bool, error) {
 	return true,nil
 }
 
+func PPPEvents(text string) {
+   switch {
+    // connected event
+    case strings.Contains(text, "remote IP address"):
+      log.Printf("Seems like peer connection have established")
+      TurnLed("blue",true)
+      break
+    // peer disconnected
+    case strings.Contains(text,"LCP terminated by peer"):
+      log.Printf("Seems like peer connection have dropped")
+      TurnLed("blue",false)
+      break
+    // dropped connection
+    case strings.Contains(text,"Modem hangup"):
+      log.Printf("Seems like peer connection have dropped")
+      TurnLed("blue",false)
+    default:
+      break
+    }
+}
+
 func StartPPP() {
 	if !PPPDaemon.running {
 
@@ -148,20 +169,8 @@ func StartPPP() {
 		for s.Scan() {
 			log.Println(string(s.Bytes()))
                         if len(string(s.Bytes())) > 0 {
-			go pppwriter(s.Bytes())
-			if strings.Contains(string(s.Bytes()),"remote IP address") {
-				log.Printf("Seems like peer connection have established")
-				TurnLed("blue",true)
-			}
-			if strings.Contains(string(s.Bytes()),"LCP terminated by peer") {
-				log.Printf("Seems like peer connection have dropped")
-				TurnLed("blue",false)
-			}
-			if strings.Contains(string(s.Bytes()),"Modem hangup") {
-				log.Printf("Seems like peer connection have dropped")
-				TurnLed("blue",false)
-			}
-
+  			  go pppwriter(s.Bytes())
+                          PPPEvents(string(s.Bytes()))
                         }
 		}
 

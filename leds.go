@@ -22,6 +22,7 @@ Color string
 }
 
 func TurnLed(color string, state bool) {
+if ENABLE_GPIO == "true" {
       for _, led := range leds {
          if led.Color == color {
             if state {
@@ -31,6 +32,7 @@ func TurnLed(color string, state bool) {
             }
          }
       }
+}
 }
 
 func (l *Led) On() {
