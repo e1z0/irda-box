@@ -2,6 +2,8 @@
 
 <img src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_case_view2.jpeg" data-canonical-src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_case_view2.jpeg" width="600"/>
 
+<img src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/irdabox-webui.png" data-canonical-src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/irdabox-webui.png" width="600"/>
+
 ## Introduction
 
 The Wifi-to-IrDA Internet Sharing Bridge (**IrDA Box**) is an innovative and cutting-edge device designed to address the connectivity gap between older devices with IrDA ports, such as legacy PDAs and Handheld PCs, and modern wireless networks. By harnessing the power of wireless optical communication, this bridge seamlessly connects devices with only IrDA support to the vast resources of the internet via a WiFi network. This groundbreaking technology ensures that even outdated gadgets can now access the internet, opening up new possibilities for productivity, communication, and entertainment.
