@@ -34,6 +34,8 @@ Final steps
 <img src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_half_case_view0.jpeg" data-canonical-src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_half_case_view0.jpeg" width="600"/>
 <img src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_half_case_view1.jpeg" data-canonical-src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_half_case_view1.jpeg" width="600"/>
 <img src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_half_case_view2.jpeg" data-canonical-src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_half_case_view2.jpeg" width="600"/>
-<img src="" data-canonical-src="" width="600"/>
 
-<img src="" data-canonical-src="" width="600"/>
+<img src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_case_view1.jpeg" data-canonical-src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_case_view1.jpeg" width="600"/>
+
+<img src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_case_view2.jpeg" data-canonical-src="https://raw.githubusercontent.com/e1z0/irda-box/master/pics/prototype1/irdabox-firstprototype_final_case_view2.jpeg" width="600"/>
+
