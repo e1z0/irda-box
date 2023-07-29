@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/cyoung/rpi v0.0.0-20170428152236-22a26803e49e // indirect
+	github.com/e1z0/obexftp v0.0.0-20230729114217-9d37e01ca7ed // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect

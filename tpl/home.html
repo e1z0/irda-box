@@ -1,7 +1,80 @@
  {{template "header" .}}
 
  <script type="text/javascript">
-    window.onload = function () {
+        window.onload = function () {
+
+        function UploadStatusMsg(msg) {
+            $('.file-message').html(msg).fadeIn(1000).delay(1000);
+        }
+
+        function uploadFile(formData) {
+            var textbox = $('.file-message');
+    $.ajax({
+            url: "/upload",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhr: function () {
+                var xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function (e) {
+                    if (e.lengthComputable) {
+                        var percent = Math.round((e.loaded / e.total) * 100);
+                        //$("#progressBar").val(percent);
+                        //$("#progressStatus").text(percent + "%");
+                    }
+                });
+                return xhr;
+            },
+            success: function (response) {
+               textbox.html("Upload successful!").fadeIn(500).delay(2000).fadeOut(3000);
+               setTimeout(function() {
+                    UploadStatusMsg("or drag and drop files here");
+                    $('.choose-file-button').fadeIn(1000).show(); // disable choose button
+                    $('#uploader').fadeIn(1000).show(); // disable input button
+                    console.log("sleep timer stop");
+                }, 5000);
+            },
+            error: function (xhr, status, error) {
+                textbox.html("Upload failed! Error: "+xhr.responseText).fadeIn(500).delay(2000).fadeOut(3000);
+                setTimeout(function() {
+                    UploadStatusMsg("or drag and drop files here");
+                    $('.choose-file-button').fadeIn(1000).show(); // disable choose button
+                    $('#uploader').fadeIn(1000).show(); // disable input button
+                    console.log("sleep timer stop");
+                }, 5000);
+            },
+        });
+   
+}
+
+        $(document).on('change', '.file-input', function() {
+        var filesCount = $(this)[0].files.length;
+        var files = $(this)[0].files;
+        let formData = new FormData();        
+        var textbox = $(this).prev();
+        if (filesCount === 1) {
+          var fileName = $(this).val().split('\\').pop();
+          textbox.text(fileName);
+          formData.append("file", files[0]);
+        } else {
+          textbox.text(filesCount + ' files selected');
+          if (filesCount >0) {
+            for (var i = 0; i < files.length; i++) {
+                formData.append('file', files[i]);
+          }
+        }
+    }
+        if (filesCount >0) {
+            console.log("starting upload..."); // write debug console
+            textbox.text("Uploading..."); // change text
+            $('.choose-file-button').hide(1000); // disable choose button
+            $('#uploader').hide(); // disable input button
+            uploadFile(formData,textbox);
+        }
+      });
+
+      
         var ppp_showing = false;
         // hook buttons for commands
         $(".run-handler").click(function(){
@@ -174,12 +247,14 @@ $('#type, #dark').on('change', function() {
                   }   
                   }
                 if (json.ppp_running) {
+                    $('.uploader-body').hide(1000);
                     $("#ppp-alert").html("PPP Is Running");
                     $("#ppp-alert").attr({class: "alert alert-success"});
                     $(".ppp-status-header").html(json.ppp_runtime);
                     $(".ppp-start").hide(1000);
                     $(".ppp-stop").show(1000);
                 } else {
+                    $('.uploader-body').show(1000);
                     $("#ppp-alert").html("PPP Is not running");
                     $("#ppp-alert").attr({class: "alert alert-danger"});
                     $(".ppp-status-header").html("PPP Is not running");
@@ -214,6 +289,13 @@ $('#type, #dark').on('change', function() {
     };
  </script>
 
+<div class="file-drop-area uploader-body">
+    <span class="choose-file-button">Upload files</span>
+    <span class="file-message">or drag and drop files here</span>
+    <input id="uploader" class="file-input" type="file" multiple>
+  </div>
+  <br/>
+
 <div id="ppp-alert" class="alert alert-danger">PPP is not running</div>
 
     <button type="button" class="btn btn-info ppp-handler" data-toggle="tooltip" data-placement="bottom" title="Toggle status of ppp daemon">
@@ -232,6 +314,7 @@ $('#type, #dark').on('change', function() {
 
 
 <br/>
+
 
 
     <!-- ppp status -->

@@ -48,6 +48,9 @@ func LoadSettings() {
 		log.Printf("Unable to load settings from settings.json: %s\n", err)
 		return
 	}
+	if settings.PPPSettings.Speed > 0 {
+		IrUp.Disabled = false
+	}
 	for _, item := range settings.Variables {
 		log.Printf("New variable: %s as setting: %s have been registered\n", item.Variable, item.Setting)
 	}

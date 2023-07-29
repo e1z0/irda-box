@@ -2,9 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -23,6 +27,7 @@ func httpPool() {
 	router.HandleFunc("/", rootHandler).Methods("GET")
 	router.HandleFunc("/term", termHandler).Methods("GET") // for testing purposes only
 	router.HandleFunc("/cmd", cmdHandler).Methods("POST")
+	router.HandleFunc("/upload", UploadHandler).Methods(("POST"))
 	router.HandleFunc("/kill", killHandler).Methods(("POST"))
 	router.HandleFunc("/ppp-start", pppstartHandler).Methods(("POST"))
 	router.HandleFunc("/ppp-stop", pppstopHandler).Methods(("POST"))
@@ -148,15 +153,62 @@ func ppprestartHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("ppp restart requested!\n")
 	defer r.Body.Close()
 	RestartPPP()
-	//		if err == nil {
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode("ok")
 	return
-	//		}
-	//	}
+}
 
-	// w.WriteHeader(500)
-	// json.NewEncoder(w).Encode(err)
+func UploadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	//w.Header().Set("Content-Type", "application/json")
+	//
+	// Parse our multipart form, 10 << 20 specifies a maximum
+    // upload of 10 MB files.
+    err := r.ParseMultipartForm(32 << 20)
+	if err != nil {
+		return
+	}
+	files := r.MultipartForm.File["file"]
+	for i, _ := range files {
+			fmt.Printf("Uploading file: %s\n",files[i].Filename)
+			file, err := files[i].Open()
+ 			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprint(w, err)
+ 				return
+ 			}
+
+			 fp := filepath.Join("/tmp/", files[i].Filename)
+			 out, err := os.Create(fp)
+			 defer out.Close()
+			 if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprint(w, err)
+				return
+			 }
+
+			 _, err = io.Copy(out, file)
+
+			 if err != nil {
+				 log.Printf("Error storing file %s data, err: %s\n",files[i].Filename,err)
+				 w.WriteHeader(500)
+				 fmt.Fprint(w, err)
+				 return
+			 }
+			 err = Upload(fp)
+			 if err != nil {
+				log.Printf("Unable to upload: %s\n",err)
+				w.WriteHeader(500)
+				fmt.Fprint(w, err)
+				return
+			 }
+		}
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode("ok")
+
 }
 
 func cmdHandler(w http.ResponseWriter, r *http.Request) {
@@ -298,6 +350,7 @@ type WebSocketMessage struct {
 	PPPStatusRunning bool   `json:"ppp_running"`
 	PPPStatus        []byte `json:"ppp_status"`
 	PPPRuntime       string `json:"ppp_runtime"`
+	Upload           IRUpload `json:"ir_upload"`
 }
 
 func StatusLoop() {
@@ -313,7 +366,7 @@ func ppp_broadcaster() {
 		msg := WebSocketMessage{}
 
 		//if string(val) != "just_a_status_update" {
-		msg = WebSocketMessage{Messages: []byte(""), Running: CurrentProgram.running, Eta: cmdElapsedTime(), StatusUpdate: true, Batteries: batteryInfo(), PPPStatus: val, PPPStatusRunning: PPPDaemon.running, PPPRuntime: PPPRuntime()}
+		msg = WebSocketMessage{Messages: []byte(""), Running: CurrentProgram.running, Eta: cmdElapsedTime(), StatusUpdate: true, Batteries: batteryInfo(), PPPStatus: val, PPPStatusRunning: PPPDaemon.running, PPPRuntime: PPPRuntime(), Upload: IrUp}
 		//}
 		for client := range clients {
 			if !socketLock {
@@ -337,9 +390,9 @@ func broadcaster() {
 		msg := WebSocketMessage{}
 
 		if string(val) == "just_a_status_update" {
-			msg = WebSocketMessage{Messages: []byte(""), Running: CurrentProgram.running, Eta: cmdElapsedTime(), StatusUpdate: true, Batteries: batteryInfo(), PPPStatusRunning: PPPDaemon.running, PPPRuntime: PPPRuntime()}
+			msg = WebSocketMessage{Messages: []byte(""), Running: CurrentProgram.running, Eta: cmdElapsedTime(), StatusUpdate: true, Batteries: batteryInfo(), PPPStatusRunning: PPPDaemon.running, PPPRuntime: PPPRuntime(), Upload: IrUp}
 		} else {
-			msg = WebSocketMessage{Messages: val, Running: CurrentProgram.running, Eta: cmdElapsedTime(), Batteries: batteryInfo(), PPPStatusRunning: PPPDaemon.running, PPPRuntime: PPPRuntime()}
+			msg = WebSocketMessage{Messages: val, Running: CurrentProgram.running, Eta: cmdElapsedTime(), Batteries: batteryInfo(), PPPStatusRunning: PPPDaemon.running, PPPRuntime: PPPRuntime(),Upload: IrUp}
 		}
 
 		//val2 := <-ppp_broadcast

@@ -1,5 +1,7 @@
 github.com/cyoung/rpi v0.0.0-20170428152236-22a26803e49e h1:jDL3OILCft4R2WB1HVf54R+JE58OY9jFgB+9dAdcync=
 github.com/cyoung/rpi v0.0.0-20170428152236-22a26803e49e/go.mod h1:ve8w1PZKio6kdJXGGFD2azvrKaeR1Bb0qReOR/PYKnY=
+github.com/e1z0/obexftp v0.0.0-20230729114217-9d37e01ca7ed h1:YVzVaj/vaZv0PBGkhFHcEHSSGvPRt0lmRCBWJlKs/8U=
+github.com/e1z0/obexftp v0.0.0-20230729114217-9d37e01ca7ed/go.mod h1:xMpM+9ophaK8h2ikB76Fmk4Llo/IxRCrMpttCx+9Scs=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=

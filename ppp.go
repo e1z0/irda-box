@@ -130,7 +130,7 @@ func PPPEvents(text string) {
 }
 
 func StartPPP() {
-	if !PPPDaemon.running {
+	if !PPPDaemon.running && !IrUp.Running {
 
         userparams := strings.Split(settings.PPPSettings.Command," ")
         mergedParams := append(PPPDaemon.PPPArgs,userparams...)
@@ -200,7 +200,9 @@ func StopPPP() {
 }
 
 func RestartPPP() {
-	StopPPP()
+	if PPPDaemon.running {
+		StopPPP()
+	}
 	time.Sleep(3 * time.Second)
 	StartPPP()
 }

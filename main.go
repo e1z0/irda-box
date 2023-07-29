@@ -22,7 +22,8 @@ func init() {
             log.Printf("Unable to find ppp binary, make sure you have install all required tools to run this application\n")
             log.Printf("Type ./irda -install to install all required software\n")
         }
-	PPPDaemon = PPP{PPPBinary: pppbin, PPPArgs: []string{"call", "irda"}}
+		PPPDaemon = PPP{PPPBinary: pppbin, PPPArgs: []string{"call", "irda"}}
+		IrUp = IRUpload{Disabled: true}
         // testing
 //        PPPDaemon.PPPBinary = "./sh-test"
         ircomms, err := ReturnIrcommIfaces()
