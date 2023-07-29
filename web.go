@@ -173,7 +173,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	files := r.MultipartForm.File["file"]
 	for i, _ := range files {
-			fmt.Printf("Uploading file: %s\n",files[i].Filename)
+			log.Printf("Uploading file: %s\n",files[i].Filename)
 			file, err := files[i].Open()
  			if err != nil {
 				w.WriteHeader(500)
@@ -206,6 +206,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			 }
 		}
+		log.Printf("Upload finished!")
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode("ok")
 

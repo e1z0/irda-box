@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -52,17 +51,17 @@ func Upload(filename string) error {
 			cli, err := obexftp.Open()
     		if err != nil {
 				if retry_count > OBEX_OPEN_RETRY {
-				fmt.Printf("Finished trying to open IrDA device!\n")
+				log.Printf("Finished trying to open IrDA device!\n")
 				IrUp.Running = false
 				return err	
 				}
-        		fmt.Printf("Error while trying to open IrDA device: %s\n",err)
+        		log.Printf("Error while trying to open IrDA device: %s\n",err)
     		} else {
-				fmt.Printf("Connected to IrDA device!\n")
+				log.Printf("Connected to IrDA device!\n")
 				client = cli
 				break
 			}
-			fmt.Printf("Retrying to connect to IrDA device...\n")
+			log.Printf("Retrying to connect to IrDA device...\n")
             time.Sleep(2*time.Second)
 		}
 		retry_count = 0
@@ -72,15 +71,15 @@ func Upload(filename string) error {
 			err := obexftp.Connect(client)
     		if err != nil {
                 if retry_count > OBEX_CONNECT_RETRY {
-					fmt.Printf("Finished trying to connect to remote host!\n")
+					log.Printf("Finished trying to connect to remote host!\n")
 					IrUp.Running = false
 					return err
 				}
-				fmt.Printf("Error while trying to connect to remote host!\n")
+				log.Printf("Error while trying to connect to remote host!\n")
     		} else {
 				break
 			}
-			fmt.Printf("Retrying to connect to remote device...\n")
+			log.Printf("Retrying to connect to remote device...\n")
 			time.Sleep(2*time.Second)
 		}
 		retry_count = 0
@@ -90,21 +89,21 @@ func Upload(filename string) error {
 			err := obexftp.Push(client,filename,filebase)
 			if err != nil {
 				if retry_count > OBEX_SEND_RETRY {
-					fmt.Printf("Finished trying to send file to the remote host!\n")
+					log.Printf("Finished trying to send file to the remote host!\n")
 					IrUp.Running = false
 					return err
 				}
-				fmt.Printf("Trying to send file to the remote host!\n")
+				log.Printf("Trying to send file to the remote host!\n")
 			} else {
 				break
 			}
-			fmt.Printf("Retrying to send file to remote device...\n")
+			log.Printf("Retrying to send file to remote device...\n")
 			time.Sleep(2*time.Second)
 		}
 		// disconnect and close the IrDA device handle
 		err := obexftp.Disconnect(client)
 		if err != nil {
-			fmt.Printf("Unable to disconnect: %s\n",err)
+			log.Printf("Unable to disconnect: %s\n",err)
 		}
 		obexftp.Close(client)
 		IrUp.Running = false
